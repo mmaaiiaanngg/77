@@ -1,151 +1,121 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import useAuthStore from '../store/authStore'
-import api from '../services/api'
-
 function Admin() {
-  const { user, isAuthenticated } = useAuthStore()
-  const [users, setUsers] = useState([])
-  const [games, setGames] = useState([])
-  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('users')
-  const navigate = useNavigate()
 
-  useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'admin') {
-      navigate('/dashboard')
-      return
-    }
-    fetchAdminData()
-  }, [isAuthenticated, user, navigate])
+  const users = [
+    { id: 1, username: 'player', email: 'player@77gaming.com', role: 'user', joined: '2026-01-15' },
+    { id: 2, username: 'admin', email: 'admin@77gaming.com', role: 'admin', joined: '2026-01-01' }
+  ]
 
-  const fetchAdminData = async () => {
-    try {
-      const [usersRes, gamesRes] = await Promise.all([
-        api.get('/admin/users'),
-        api.get('/admin/games')
-      ])
-      setUsers(usersRes.data)
-      setGames(gamesRes.data)
-    } catch (error) {
-      console.error('Error fetching admin data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await api.delete(`/admin/users/${userId}`)
-        setUsers(users.filter(u => u.id !== userId))
-      } catch (error) {
-        console.error('Error deleting user:', error)
-      }
-    }
-  }
-
-  const handleDeleteGame = async (gameId) => {
-    if (window.confirm('Are you sure you want to delete this game?')) {
-      try {
-        await api.delete(`/admin/games/${gameId}`)
-        setGames(games.filter(g => g.id !== gameId))
-      } catch (error) {
-        console.error('Error deleting game:', error)
-      }
-    }
-  }
-
-  if (loading) return <div className="container mx-auto py-12">Loading...</div>
+  const games = [
+    { id: 1, name: 'Space Invaders', category: 'Action', rating: 4.5, players: 12500 },
+    { id: 2, name: 'Tetris', category: 'Puzzle', rating: 4.8, players: 18200 }
+  ]
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-8">Admin Panel</h1>
+    <div className="min-h-screen bg-dark py-12">
+      <div className="container mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-primary mb-2">Admin Dashboard</h1>
+          <p className="text-gray-400">Manage users and games</p>
+        </div>
 
-      <div className="flex gap-4 mb-8">
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded ${activeTab === 'users' ? 'bg-primary' : 'bg-secondary'}`}
-        >
-          Users ({users.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('games')}
-          className={`px-4 py-2 rounded ${activeTab === 'games' ? 'bg-primary' : 'bg-secondary'}`}
-        >
-          Games ({games.length})
-        </button>
+        {/* Tabs */}
+        <div className="bg-secondary rounded-lg border border-primary border-opacity-20 overflow-hidden">
+          <div className="flex border-b border-primary border-opacity-20">
+            {['users', 'games'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-4 font-bold uppercase text-sm transition ${
+                  activeTab === tab
+                    ? 'text-primary border-b-2 border-primary -mb-px'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="p-6">
+            {activeTab === 'users' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-white">Users ({users.length})</h2>
+                  <button className="bg-primary text-dark px-6 py-2 rounded font-bold hover:opacity-90">
+                    + Add User
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-primary border-opacity-20">
+                        <th className="text-left py-3 px-4 text-gray-400">Username</th>
+                        <th className="text-left py-3 px-4 text-gray-400">Email</th>
+                        <th className="text-left py-3 px-4 text-gray-400">Role</th>
+                        <th className="text-left py-3 px-4 text-gray-400">Joined</th>
+                        <th className="text-left py-3 px-4 text-gray-400">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((user) => (
+                        <tr key={user.id} className="border-b border-primary border-opacity-10 hover:bg-dark hover:bg-opacity-50 transition">
+                          <td className="py-3 px-4 font-bold text-white">{user.username}</td>
+                          <td className="py-3 px-4 text-gray-400">{user.email}</td>
+                          <td className="py-3 px-4">
+                            <span className={`px-3 py-1 rounded text-sm ${
+                              user.role === 'admin' ? 'bg-primary text-dark' : 'bg-secondary text-gray-400'
+                            }`}>
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-gray-400">{user.joined}</td>
+                          <td className="py-3 px-4">
+                            <button className="text-red-500 hover:text-red-400 font-bold">Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'games' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-white">Games ({games.length})</h2>
+                  <button className="bg-primary text-dark px-6 py-2 rounded font-bold hover:opacity-90">
+                    + Add Game
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {games.map((game) => (
+                    <div key={game.id} className="bg-dark rounded-lg p-6 border border-primary border-opacity-20">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="text-xl font-bold text-white">{game.name}</h3>
+                          <p className="text-sm text-gray-400">{game.category}</p>
+                        </div>
+                        <span className="bg-primary text-dark px-3 py-1 rounded font-bold">⭐ {game.rating}</span>
+                      </div>
+                      <p className="text-gray-400 mb-4">👥 {game.players.toLocaleString()} players</p>
+                      <div className="flex gap-2">
+                        <button className="flex-1 bg-primary text-dark px-4 py-2 rounded font-bold hover:opacity-90">Edit</button>
+                        <button className="flex-1 bg-red-600 text-white px-4 py-2 rounded font-bold hover:opacity-90">Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-
-      {activeTab === 'users' && (
-        <div className="bg-secondary rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-primary">
-              <tr>
-                <th className="p-4 text-left">ID</th>
-                <th className="p-4 text-left">Username</th>
-                <th className="p-4 text-left">Email</th>
-                <th className="p-4 text-left">Role</th>
-                <th className="p-4 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user.id} className="border-t border-light">
-                  <td className="p-4">{user.id}</td>
-                  <td className="p-4">{user.username}</td>
-                  <td className="p-4">{user.email}</td>
-                  <td className="p-4">{user.role}</td>
-                  <td className="p-4">
-                    <button
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="bg-red-600 px-3 py-1 rounded hover:opacity-90"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {activeTab === 'games' && (
-        <div className="bg-secondary rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-primary">
-              <tr>
-                <th className="p-4 text-left">ID</th>
-                <th className="p-4 text-left">Name</th>
-                <th className="p-4 text-left">Category</th>
-                <th className="p-4 text-left">Rating</th>
-                <th className="p-4 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {games.map(game => (
-                <tr key={game.id} className="border-t border-light">
-                  <td className="p-4">{game.id}</td>
-                  <td className="p-4">{game.name}</td>
-                  <td className="p-4">{game.category}</td>
-                  <td className="p-4">⭐ {game.rating}</td>
-                  <td className="p-4">
-                    <button
-                      onClick={() => handleDeleteGame(game.id)}
-                      className="bg-red-600 px-3 py-1 rounded hover:opacity-90"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   )
 }
 
+import { useState } from 'react'
 export default Admin
