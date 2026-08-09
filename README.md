@@ -81,6 +81,7 @@ npm run dev
 ```bash
 cd frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
