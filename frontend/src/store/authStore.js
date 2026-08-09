@@ -1,43 +1,64 @@
 import { create } from 'zustand'
 import api from '../services/api'
 
-const useAuthStore = create((set) => (({
+const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
-  isLoading: false,
+  loading: true,
 
+  // Check if user is logged in on mount
+  checkAuth: async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (token) {
+        const response = await api.get('/auth/me')
+        set({ user: response.data, isAuthenticated: true })
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error)
+      localStorage.removeItem('token')
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  // Register
+  register: async (username, email, password) => {
+    try {
+      const response = await api.post('/auth/register', {
+        username,
+        email,
+        password,
+        confirmPassword: password
+      })
+      localStorage.setItem('token', response.data.token)
+      set({ user: response.data.user, isAuthenticated: true })
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.response?.data?.message }
+    }
+  },
+
+  // Login
   login: async (email, password) => {
-    set({ isLoading: true })
     try {
       const response = await api.post('/auth/login', { email, password })
       localStorage.setItem('token', response.data.token)
       set({ user: response.data.user, isAuthenticated: true })
-      return response.data
+      return { success: true }
     } catch (error) {
-      throw error
-    } finally {
-      set({ isLoading: false })
+      return { success: false, error: error.response?.data?.message }
     }
   },
 
-  register: async (userData) => {
-    set({ isLoading: true })
-    try {
-      const response = await api.post('/auth/register', userData)
-      localStorage.setItem('token', response.data.token)
-      set({ user: response.data.user, isAuthenticated: true })
-      return response.data
-    } catch (error) {
-      throw error
-    } finally {
-      set({ isLoading: false })
-    }
-  },
-
+  // Logout
   logout: () => {
     localStorage.removeItem('token')
     set({ user: null, isAuthenticated: false })
-  },
-})))
+  }
+}))
+
+// Check auth on app start
+useAuthStore.getState().checkAuth()
 
 export default useAuthStore
