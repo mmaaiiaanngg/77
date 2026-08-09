@@ -1,0 +1,94 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Button styles */
+button {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Input styles */
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* Link styles */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Grid utilities */
+.grid-cols-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.grid-cols-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+.gap-8 {
+  gap: 2rem;
+}
+
+/* Spacing utilities */
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mt-12 {
+  margin-top: 3rem;
+}
