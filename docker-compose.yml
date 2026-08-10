@@ -6,6 +6,7 @@ services:
     ports:
       - '3000:5173'
     environment:
+      # Vite exposes this value to the browser, so it must use the host-mapped backend URL.
       VITE_API_URL: http://localhost:5000
     depends_on:
       backend:
