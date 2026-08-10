@@ -31,15 +31,18 @@ function Navbar() {
                   Admin
                 </Link>
               )}
-              <div className="flex gap-4">
-                <span className="text-sm">Welcome, {user?.username}</span>
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-600 px-4 py-2 rounded hover:opacity-90"
-                >
-                  Logout
-                </button>
-              </div>
+              <Link to="/profile" className="hover:text-primary transition" title="Profile">
+                👤 {user?.username}
+              </Link>
+              <Link to="/settings" className="hover:text-primary transition" title="Settings">
+                ⚙️
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 px-4 py-2 rounded hover:opacity-90"
+              >
+                Logout
+              </button>
             </>
           ) : (
             <>
